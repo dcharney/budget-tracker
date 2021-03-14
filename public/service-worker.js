@@ -4,7 +4,7 @@ const DATA_CACHE_NAME = 'budget-tracker-data-cache';
 const FILES_TO_CACHE = [
     '/',
     '/index.html',
-    //'/manifest.json',
+    '/manifest.json',
     '/css/styles.css',
     '/js/idb.js',
     '/js/index.js',    
@@ -25,7 +25,6 @@ self.addEventListener('install', function(e) {
             return cache.addAll(FILES_TO_CACHE);
         })
     );
-    self.skipWaiting();
 });
 
 self.addEventListener('activate', function(e) {
@@ -41,7 +40,6 @@ self.addEventListener('activate', function(e) {
             )
         })
     )
-    self.ClientRectList.claim();
 });
 
 self.addEventListener('fetch', function(e) {
