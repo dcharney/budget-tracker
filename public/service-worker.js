@@ -6,7 +6,8 @@ const FILES_TO_CACHE = [
     '/index.html',
     //'/manifest.json',
     '/css/styles.css',
-    '/js/index.js',
+    '/js/idb.js',
+    '/js/index.js',    
     '/icons/icon-72x72.png',
     '/icons/icon-96x96.png',
     '/icons/icon-128x128.png',
@@ -24,6 +25,7 @@ self.addEventListener('install', function(e) {
             return cache.addAll(FILES_TO_CACHE);
         })
     );
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', function(e) {
@@ -39,10 +41,15 @@ self.addEventListener('activate', function(e) {
             )
         })
     )
+    self.ClientRectList.claim();
 });
 
 self.addEventListener('fetch', function(e) {
     if (e.request.url.includes('/api/')) {
+        console.log('fetch request : ' + e.request.url);
+        if (e.request.method === 'POST') {
+            return;
+        }
         e.respondWith(
             caches
                 .open(DATA_CACHE_NAME)
@@ -50,15 +57,17 @@ self.addEventListener('fetch', function(e) {
                     return fetch(e.request)
                         .then(response => {
                             if (response.status === 200) {
+                                console.log('succesful request, cloning data to cache');
                                 cache.put(e.request.url, response.clone());
                             }
                             return response;
                         })
                         .catch(err => {
+                            console.log('you are offline, data is being managed by cache');
                             return cache.match(e.request);
                         });
                 })
-                .catch(err => console.log(err))
+                .catch(err => {console.log(err)})
         );
         return;
     };

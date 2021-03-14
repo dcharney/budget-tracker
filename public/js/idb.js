@@ -22,7 +22,22 @@ function saveRecord(record) {
     const transaction = db.transaction(['new-transaction'], 'readwrite');
     const transactionObjectStore = transaction.objectStore('new-transaction');
     transactionObjectStore.add(record);
-}
+    alert("Offline transaction has been stored in indexedDB!");
+};
+
+function getRecords() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['new-transaction'], 'readonly');
+        const transactionObjectStore = transaction.objectStore('new-transaction');  
+        const getAll = transactionObjectStore.getAll();
+        getAll.onsuccess = function() {
+            if (getAll.result.length > 0) {
+                resolve(getAll.result);
+            };
+            reject(Error('No offline data.'));
+        };
+    }).catch((err)=>{console.log('No data currently in offline storage.')});
+};
 
 function uploadTransaction() {
     const transaction = db.transaction(['new-transaction'], 'readwrite');
@@ -57,6 +72,6 @@ function uploadTransaction() {
                 });
         }
     }
-}
+};
 
 window.addEventListener('online', uploadTransaction);

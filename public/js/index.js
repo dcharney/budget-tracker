@@ -8,11 +8,18 @@ fetch("/api/transaction")
   .then(data => {
     // save db data on global variable
     transactions = data;
+    // add offline transactions stored in indexeddb to list
+    return getRecords();
+  })
+  .then(offlineTransactions => {
+    if (offlineTransactions) {
+      offlineTransactions.forEach(offlineTransaction => {transactions.unshift(offlineTransaction)});
+    };
 
     populateTotal();
     populateTable();
     populateChart();
-  });
+  })
 
 function populateTotal() {
   // reduce transaction amounts to a single total value
